@@ -18,6 +18,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import traceback
+
 from src.aws.secretManager import get_secret
 
 import socketio
@@ -56,7 +58,7 @@ def send_change_password_email(info: ChangePassword, db: Session = Depends(datab
     msg['To'] = email
     msg['Subject'] = '나눔사 비밀번호 재설정 메일입니다.'
 
-    html = MIMEText('다음의 버튼을 클릭하시면 비밀번호 재설정 화면으로 이동합니다.<br />원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="http://localhost:5173/change/password" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="비밀번호 변경하기" /></form>' % verifyToken, 'html')
+    html = MIMEText('다음의 버튼을 클릭하시면 비밀번호 재설정 화면으로 이동합니다.<br />원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="http://localhost/change/password" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="비밀번호 변경하기" /></form>' % verifyToken, 'html')
 
     msg.attach(html)
 
@@ -89,7 +91,7 @@ def send_verify_email_and_save_data(email: VerifyEmailToken, db: Session = Depen
     msg['To'] = email
     msg['Subject'] = '나눔사 인증 메일입니다.'
 
-    html = MIMEText('다음의 버튼을 클릭하시면 인증 화면으로 이동합니다.<br />인증을 원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="http://localhost:5173/verify/email" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="인증하기" /></form>' % verifyToken, 'html')
+    html = MIMEText('다음의 버튼을 클릭하시면 인증 화면으로 이동합니다.<br />인증을 원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="http://localhost/verify/email" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="인증하기" /></form>' % verifyToken, 'html')
 
     msg.attach(html)
 
@@ -131,7 +133,7 @@ def make_email_verify_with_token(token:VerifyEmail, db: Session = Depends(databa
         def disconnect():
             print('Disconnected from server')
 
-        sio.connect('ws://127.0.0.1:3030', transports=['websocket'], wait_timeout=10)
+        sio.connect('ws://localhost/socket', transports=['websocket'], wait_timeout=10)
         sio.send(token.token)
 
         @sio.event

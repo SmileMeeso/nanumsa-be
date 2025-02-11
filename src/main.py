@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 
-
-
 # 라우터들
 from src.controllers.login import login_controller
 from src.controllers.application import applicaction_controller
@@ -17,10 +15,7 @@ app.include_router(verify_controller.router)
 app.include_router(applicaction_controller.router)
 app.include_router(lookup_controller.router)
 
-origins = [
-    "http://localhost:5173",
-    "ws://localhost:3030",
-]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,

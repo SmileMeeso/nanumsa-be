@@ -119,7 +119,6 @@ def get_share_list_with_bounds(bounds: MapBoundsInfo, db: Session = Depends(data
                 "point": to_shape(result.point).__geo_interface__ if result.point else None
             }
             response_data.append(row_dict)
-
         return JSONResponse(content=jsonable_encoder({"success": response_data}))
     else: 
         stmt = select(
