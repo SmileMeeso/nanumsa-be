@@ -135,7 +135,7 @@ router = APIRouter(dependencies=[Depends(verify_token)])
 seoul_time = datetime.now(ZoneInfo('Asia/Seoul'))
 
 
-cred = credentials.Certificate(os.environ["NANUMSA_SERVER_FIREBASE_ADMIN_CREDENTIAL_FILE_PATH"])
+cred = credentials.Certificate(json.loads(os.environ["NANUMSA_SERVER_FIREBASE_ADMIN_CREDENTIAL_FILE_PATH"]))
 firebase_admin.initialize_app(cred)
 
 @router.patch('/user/nickname', tags=['app'])
