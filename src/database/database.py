@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+import os
+
 from sqlalchemy.sql import func
 
 from sqlalchemy import Boolean, Column, Integer, String, Time, DateTime, Sequence, Float
@@ -12,7 +14,7 @@ from src.aws.secretManager import get_secret
 
 
 connection_info = get_secret('candleHelper/DB/postgres/prod')
-engine = create_engine(f'postgresql://%s:%s@%s:%s/%s' % (connection_info["username"], connection_info["password"], connection_info["host"], connection_info["port"], connection_info["dbname"]))
+engine = create_engine(f'postgresql://%s:%s@%s:%s/%s' % (connection_info["username"], connection_info["password"], os.getenv('POSTGRESQL_HOST') or 'localhost', os.getenv('POSTGRESQL_POST') or '5432', connection_info["dbname"]))
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 def get_db():
