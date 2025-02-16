@@ -125,7 +125,7 @@ def make_email_verify_with_token(token:VerifyEmail, db: Session = Depends(databa
         
         # socket.io 클라이언트 생성
         session_cookie = token.token
-        sio = socketio.Client(cookie=session_cookie)
+        sio = socketio.Client()
 
         @sio.on('*')
         def any_event(event, sid, data):
