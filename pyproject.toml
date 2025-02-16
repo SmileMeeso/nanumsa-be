@@ -25,7 +25,8 @@ dependencies = [
     "asyncio (>=3.4.3,<4.0.0)",
     "psycopg2-binary (>=2.9.10,<3.0.0)",
     "python-socketio[client] (>=5.12.1,<6.0.0)",
-    "websocket-client (>=1.8.0,<2.0.0)"
+    "websocket-client (>=1.8.0,<2.0.0)",
+    "websockets (>=14.2,<15.0)"
 ]
 
 [tool.poetry]

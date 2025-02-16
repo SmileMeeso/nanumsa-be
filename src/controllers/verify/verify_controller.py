@@ -25,6 +25,7 @@ import traceback
 from src.aws.secretManager import get_secret
 
 import socketio
+import websockets
 
 class VerifyEmailToken(BaseModel):
     email: str
@@ -93,7 +94,7 @@ def send_verify_email_and_save_data(email: VerifyEmailToken, db: Session = Depen
     msg['To'] = email
     msg['Subject'] = '나눔사 인증 메일입니다.'
 
-    html = MIMEText('다음의 버튼을 클릭하시면 인증do 화면으로 이동합니다.<br />인증을 원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="%s" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="인증하기" /></form>' % (os.getenv("HOST") + "/verify/email" or "http://localhost/verify/email", verifyToken), 'html')
+    html = MIMEText('다음의 버튼을 클릭하시면 인증 화면으로 이동합니다.<br />인증을 원하지 않으시면 이 메일을 무시해주세요.<br /><br /><form action="%s" target="_blank method="get"><input id="token" type="hidden" name="token" value="%s" /><input type="submit" value="인증하기" /></form>' % (os.getenv("HOST") + "/verify/email" or "http://localhost/verify/email", verifyToken), 'html')
 
     msg.attach(html)
 
@@ -123,7 +124,14 @@ def make_email_verify_with_token(token:VerifyEmail, db: Session = Depends(databa
     if row and row.is_verified is False:
         
         # socket.io 클라이언트 생성
-        sio = socketio.Client()
+        session_cookie = token.token
+        sio = socketio.Client(cookie=session_cookie)
+
+        @sio.on('*')
+        def any_event(event, sid, data):
+            print(event)
+            print(sid)
+            print(data)
 
         # 서버와의 연결 이벤트 핸들러
         @sio.event
@@ -135,7 +143,11 @@ def make_email_verify_with_token(token:VerifyEmail, db: Session = Depends(databa
         def disconnect():
             print('Disconnected from server')
 
-        sio.connect(os.getenv('SOCKET_ADDRESS') or 'ws://localhost:3000', transports=['websocket'], wait_timeout=10)
+        @sio.event
+        def connect_error(message):
+            print('Connection was rejected due to ' + message)
+
+        sio.connect('url', transports=['websocket'], wait_timeout=10, wait=True)
         sio.send(token.token)
 
         @sio.event
