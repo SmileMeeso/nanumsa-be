@@ -33,6 +33,12 @@ from firebase_admin import credentials
 
 import os
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+connection_info = get_secret('candleHelper/DB/postgres/prod')
+
 class EditWithTokenUserInfo(BaseModel):
     nickname: Optional[str] = None
     password: Optional[str] = None
@@ -134,8 +140,14 @@ router = APIRouter(dependencies=[Depends(verify_token)])
 
 seoul_time = datetime.now(ZoneInfo('Asia/Seoul'))
 
+certificate_json = None
+try:
+    certificate_json = json.loads(os.getenv("NANUMSA_SERVER_FIREBASE_ADMIN_CREDENTIAL_FILE_PATH"))
+except:
+    with open(os.getenv("NANUMSA_SERVER_FIREBASE_ADMIN_CREDENTIAL_FILE_PATH")) as f:
+        certificate_json = json.load(f)
 
-cred = credentials.Certificate(json.loads(os.environ["NANUMSA_SERVER_FIREBASE_ADMIN_CREDENTIAL_FILE_PATH"]))
+cred = credentials.Certificate(certificate_json)
 firebase_admin.initialize_app(cred)
 
 @router.patch('/user/nickname', tags=['app'])

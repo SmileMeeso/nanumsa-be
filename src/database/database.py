@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import os
+import logging
 
 from sqlalchemy.sql import func
 
@@ -12,7 +13,13 @@ from geoalchemy2 import Geometry
 
 from src.aws.secretManager import get_secret
 
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 connection_info = get_secret('candleHelper/DB/postgres/prod')
+
 engine = create_engine(f'postgresql://{connection_info["username"]}:{connection_info["password"]}@{os.getenv("POSTGRESQL_HOST") or "localhost"}:{os.getenv("POSTGRESQL_PORT") or "5432"}/{connection_info["dbname"]}')
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 

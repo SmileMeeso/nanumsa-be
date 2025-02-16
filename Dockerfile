@@ -8,7 +8,7 @@ ARG POSTGRESQL_PORT
 
 ENV SOCKET_ADDRESS=wss://www.nanumsa.com/socket
 ENV HOST=https://www.nanumsa.com
-ENV POSTGRESQL_HOST=43.202.65.117
+ENV POSTGRESQL_HOST=postgresql-svc
 ENV POSTGRESQL_PORT=5432
 
 # 추가적으로 curl 설치
